@@ -1,2 +1,7 @@
 @import './common';
 @import './example';
+
+.keys__item,
+.keys__subitem {
+  list-style: none;
+}
