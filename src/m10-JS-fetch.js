@@ -61,6 +61,11 @@ function onSubmit(e) {
   e.currentTarget.reset();
 }
 
+function onClear() {
+  refs.ul.innerHTML = '';
+  refs.urlContainer.innerHTML = '';
+}
+
 //   const {
 //     elements: { delay, step, amount },
 // } = e.currentTarget;
@@ -74,105 +79,109 @@ function fetchData(url) {
     });
 }
 
-// function getAllKeys(obj) {
-//   const keyList = [];
+function getAllValue(obj) {
+  //   console.log('obj :>> ', obj);
 
-//   for (const key of Object.keys(obj)) {
-//     keyList.push({ key });
+  const list = lodash.map(
+    obj,
+    (value, key) => {
+      // console.group(`key: ${key}`);
+      //   console.group(`Вложенность`);
+      // console.log('list', list);
+      if (
+        lodash.isArray(value) ||
+        lodash.isPlainObject(value) ||
+        lodash.isObject(value)
+      ) {
+        // console.log(value);
+        // getAllValue(value);
+        return { key, value: getAllValue(value) };
+      }
+      //   console.log('{ key, value } :>> ', { key, value });
+      //   console.groupEnd();
+      return { key, value };
+    },
+    {}
+  );
+  return list;
+}
 
-//     const hasSubKey =
-//       !obj[key].length &&
-//       obj[key].length !== 0 &&
-//       Object.getOwnPropertyNames(obj[key]).length;
+// function renderCheckList(list) {
+//   //   console.log('list :>> ', list);
 
-//     if (hasSubKey) {
-//       const subKeys = Object.getOwnPropertyNames(obj[key]);
+//   lodash.each(list, (value, key) => {
+//     // console.group(`key: ${key}`);
+//     // console.log(value);
 
-//       keyList[keyList.length - 1].subKeys = subKeys;
-//       //   console.log('keyList :>> ', keyList);
+//     // console.log('создать внутренний ЮЛ');
+//     // const innerUl = document.createElement('ul');
+//     // const innerLi = document.createElement('li');
+//     // innerLi.textContent = key;
+
+//     if (
+//       lodash.isArray(value) ||
+//       lodash.isPlainObject(value) ||
+//       lodash.isObject(value)
+//     ) {
+//       console.group(`key внутри: ${key}`);
+//       console.log(value);
+//       console.groupEnd();
+//       //   console.log('создать внутренний ЛИ');
+
+//       //   const outerLi = document.createElement('li');
+//       //   outerLi.textContent = key;
+//       //   console.log(outerLi);
+
+//       renderCheckList(value);
+
+//       //   outerLi.append(innerUl);
 //     }
-//   }
-//   return keyList;
+
+//     // console.log('создать ЛИ');
+//     // innerUl.append(innerLi);
+
+//     // refs.ul.append(outerLi);
+
+//     console.groupEnd();
+//   });
 // }
 
-function getAllValue(obj) {
-  console.log('obj :>> ', obj);
-  lodash.forIn(obj, (value, key) => {
-    console.group(`key: ${key}`);
-    console.log(`has value:`, value);
-    if (
-      lodash.isArray(value) ||
-      lodash.isPlainObject(value) ||
-      lodash.isObject(value)
-    ) {
-      getAllValue(value);
-    }
-    console.groupEnd();
-  });
+function renderSubList(el) {
+  if (
+    lodash.isArray(el.value) ||
+    lodash.isPlainObject(el.value) ||
+    lodash.isObject(el.value)
+  ) {
+    //! step of recurtion --------------------------------------
 
-  //   const allKeys = lodash.map(obj, key => {
-  //     //   console.log('key :>> ', key);
+    const subValueList = el.value.map(subValue => {
+      return renderSubList(subValue);
+    });
 
-  //     if (lodash.isPlainObject(key)) {
-  //       console.log('isPlainObject key :>> ', key);
+    const outerLi = document.createElement('li');
+    const outerUl = document.createElement('ul');
+    outerLi.textContent = el.key;
 
-  //       //   getAllValue(key);
-  //     }
+    outerLi.append(outerUl);
+    outerUl.append(...subValueList);
 
-  //     if (lodash.isArray(key)) {
-  //       console.log('isArray key :>> ', key);
+    return outerLi;
+  } else {
+    //! base of recurtion --------------------------------------
 
-  //       //   getAllValue(key);
-  //     }
+    const innerLi = document.createElement('li');
+    innerLi.textContent = el.key;
 
-  //     // console.log('lodash.keys(key) :>> ', lodash.keys(key));
-  //   });
+    return innerLi;
+  }
 }
 
-function renderKeyLi(keyArray) {
-  const list = keyArray.map(({ key, subKeys }) => {
-    const p = document.createElement('p');
-
-    const li = document.createElement('li');
-    const label = document.createElement('label');
-    const input = document.createElement('input');
-
-    li.className = 'keys__item';
-    label.textContent = ` ${key}`;
-    input.type = 'checkbox';
-    input.name = `${key}`;
-    input.dataset.key = `${key}`;
-
-    label.prepend(input);
-    li.append(label);
-
-    if (subKeys) {
-      //   console.log(subKeys);
-      const subLI = subKeys
-        .map(
-          el =>
-            `<li class="keys__subitem"><label><input type="checkbox" name="${el}" data-key="${el}"/> ${el}</label></li>`
-        )
-        .join('');
-      const subUL = document.createElement('ul');
-      subUL.className = 'keys__sublist';
-      subUL.innerHTML = subLI;
-      li.append(subUL);
-      //   li.insertAdjacentHTML('beforeend', subUL);
-      //   console.log('subLI :>> ', subUL);
-      //   console.log('li :>> ', li);
-    }
-
-    return li;
+function renderCheckList(list) {
+  const allList = lodash.map(list, el => {
+    return renderSubList(el);
   });
-  //
 
-  refs.ul.append(...list);
-}
-
-function onClear() {
-  refs.ul.innerHTML = '';
-  refs.urlContainer.innerHTML = '';
+  refs.ul.append(...allList);
 }
 
 function getChecked() {
@@ -188,7 +197,12 @@ function getChecked() {
 function renderChecked() {
   //   fetchData(linkURL).then(data => {
   fetchData('https://pokeapi.co/api/v2/pokemon/13').then(data => {
-    getAllValue(data);
+    // console.log('getAllValue(data) >> ', getAllValue(data));
+    const checkList = getAllValue(data);
+    // const checkList = data;
+    console.log('checkList :>> ', checkList);
+    renderCheckList(checkList);
+
     // console.log('data :>> ', data);
     // console.log('lodash.isArrayLikeObject :>> ', lodash.isObject(data));
     // console.log('getChecked :>> ', getChecked());
@@ -198,4 +212,12 @@ function renderChecked() {
     // Notiflix.Report.success('Cheked...', result);
     // console.table('result :>> ', result);
   });
+}
+
+function listElement(template) {
+//   el.key;
+}
+
+const templateElement = {
+    
 }
