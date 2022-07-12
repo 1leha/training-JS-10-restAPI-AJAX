@@ -43,6 +43,15 @@ refs.form.addEventListener('submit', onSubmit);
 refs.clearBtn.addEventListener('click', onClear);
 refs.getDataBtn.addEventListener('click', renderChecked);
 
+// const templateElement = {
+//   htmlEl: `<li class="keys__item">
+//             <label class="keys__label">
+//               <input class="keys__input" type="checkbox" />
+//               ${this.name}
+//             </label>
+//           </li>`,
+// };
+
 function onSubmit(e) {
   e.preventDefault();
 
@@ -55,8 +64,8 @@ function onSubmit(e) {
 
   //   console.log('fetchData(url) :>> ', fetchData(url));
   fetchData(linkURL).then(data => {
-    const keyList = getAllKeys(data);
-    renderKeyLi(keyList);
+    const checkList = getAllValue(data);
+    renderCheckList(checkList);
   });
   e.currentTarget.reset();
 }
@@ -158,9 +167,14 @@ function renderSubList(el) {
       return renderSubList(subValue);
     });
 
-    const outerLi = document.createElement('li');
+    // console.log('subValueList :>> ', subValueList.join(''));
+
+    // const outerLi = document.createElement('li');
+
+    const outerLi = htmlElement(el.key, '');
+    outerLi.className = 'keys__item';
     const outerUl = document.createElement('ul');
-    outerLi.textContent = el.key;
+    // outerLi.textContent = el.key;
 
     outerLi.append(outerUl);
     outerUl.append(...subValueList);
@@ -169,8 +183,13 @@ function renderSubList(el) {
   } else {
     //! base of recurtion --------------------------------------
 
-    const innerLi = document.createElement('li');
-    innerLi.textContent = el.key;
+    const innerLi = htmlElement(el.key, el.value);
+    innerLi.className = 'keys__subitem';
+
+    // const innerLi = document.createElement('li');
+    // innerLi.textContent = el.key;
+
+    // console.log('innerLi :>> ', innerLi);
 
     return innerLi;
   }
@@ -195,14 +214,9 @@ function getChecked() {
 }
 
 function renderChecked() {
-  //   fetchData(linkURL).then(data => {
-  fetchData('https://pokeapi.co/api/v2/pokemon/13').then(data => {
+  fetchData(linkURL).then(data => {
+    //   fetchData('https://pokeapi.co/api/v2/pokemon/13').then(data => {
     // console.log('getAllValue(data) >> ', getAllValue(data));
-    const checkList = getAllValue(data);
-    // const checkList = data;
-    console.log('checkList :>> ', checkList);
-    renderCheckList(checkList);
-
     // console.log('data :>> ', data);
     // console.log('lodash.isArrayLikeObject :>> ', lodash.isObject(data));
     // console.log('getChecked :>> ', getChecked());
@@ -214,10 +228,20 @@ function renderChecked() {
   });
 }
 
-function listElement(template) {
-//   el.key;
-}
+function htmlElement(name, value) {
+  const li = document.createElement('li');
 
-const templateElement = {
-    
+  if (value === undefined) {
+    return;
+  }
+
+  li.innerHTML = `
+            <label class="keys__label">
+              <input class="keys__input" type="checkbox" />
+              ${name}
+              <span class="keys__value">${value}</span>
+            </label>
+          `;
+
+  return li;
 }

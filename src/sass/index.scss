@@ -4,4 +4,42 @@
 .keys__item,
 .keys__subitem {
   list-style: none;
+  margin-bottom: 5px;
+}
+
+.keys__value {
+  padding: 3px;
+  border-radius: 3px;
+  margin-left: 5px;
+
+  font-size: 0.7em;
+
+  color: rgb(131, 131, 131);
+  //   background-color: rgb(238, 238, 238);
+}
+
+.form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.form > *:not(:last-child) {
+  margin-right: 5px;
+}
+
+.form__input {
+  flex: 1 1 auto;
+}
+
+.render-button {
+  width: 100%;
+  padding: 5px;
+  //   margin-bottom: 10px;
+}
+
+.url-container {
+  font-size: 1.2em;
+  margin-bottom: 20px;
 }
